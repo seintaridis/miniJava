@@ -1,0 +1,35 @@
+Gia na trexei i askisi
+-ston fakelo compiler4 pliktrologeis make
+-stin sinexeia trexeis java Main TreeVisitor.spg (opoio arxeio thes egw exw mesa to treevisitor kai to factorial)
+kai dimiourgountai ta facts sto exis path compiler4/iris/datalog-examples/spiglet/facts
+sti sinexeia kaneis cd ston fakelo iris kai apo ekei trexeis tin entoli make run-spiglet
+gia na trexoun ta queries.
+
+
+
+
+?- in(?i,?m,?t).
+
+gia to in xrisimopoiw ton orismo apo tis diafaneies gia ta live variables
+in[I] = ( out[I] – def[I] )
+∪ use[I]
+
+?- dead(?grammi,?methodos,?m).
+
+mia metavliti einai nekri an orizete kai dn iparxei sto next tis epomenis entolis
+
+
+
+?- basic_block(?method,?begin,?end).
+
+vriskw arxi kai telos enos basic block simfwna me tis diafaneiss
+Basic block starts:
+ At a label
+ After a jump
+
+ end at a jump,before label
+
+
+?- constant_prop(?l,?m,?t,?c).
+
+vriskw apo to const move pia einai kai opou exw varuse tin xrisimopoiw arkei na einaimn eiani dead aki na anikei sto idio basic block

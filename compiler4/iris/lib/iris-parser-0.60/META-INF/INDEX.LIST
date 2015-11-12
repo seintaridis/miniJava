@@ -1,0 +1,13 @@
+JarIndex-Version: 1.0
+
+iris-parser-0.60.jar
+org
+org/deri
+org/deri/iris
+org/deri/iris/compiler
+org/deri/iris/parser
+org/deri/iris/parser/analysis
+org/deri/iris/parser/lexer
+org/deri/iris/parser/node
+org/deri/iris/parser/parser
+

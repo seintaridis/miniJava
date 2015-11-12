@@ -1,0 +1,95 @@
+cJumpInstruction(?m, ?i) :- next(?m, ?i, ?j),
+                            next(?m, ?i, ?k),
+                            ?i+1 = ?k,
+                            ?j != ?k.
+
+jumpInstruction(?m, ?i) :- next(?m, ?i, ?j),
+                           ?i+1 = ?k,
+                           ?j != ?k,
+                           !next(?m, ?i, ?k).
+
+
+
+in(?i,?m,?k) :-varUse(?k, ?i, ?m).
+
+in(?i,?m,?onoma) :-out(?i,?m,?onoma),
+            !varDef(?onoma, ?i,?m).
+
+
+
+
+
+out(?i,?m,?s):-next(?s,  ?i,  ?j),
+            in(?j,?m, ?s).
+
+
+dead(?i,?s,?m):-   varDef(?s, ?i, ?m),
+                next(?s,  ?i,  ?j),
+                !in(?j,?m, ?s).
+
+
+basic_block_start(?j,?method):- next(?method,?i,?j),
+                                 ?i+1 = ?k,
+                                  ?k != ?j.
+
+
+
+
+basic_block_start(?k,?method):- next(?method,?i,?j),
+                                 ?i+1 = ?k,
+                                  ?k != ?j.
+
+
+basic_block_start(?i,?method):-   next(?method,?i,?j),
+                                  ?i=1.
+
+
+
+
+
+last_row(?i,?method):-  instruction(?method,	?i,?k),
+                        !next(?method,?i,?j).
+
+
+
+basic_block_end(?i,?method):-  next(?method,?i,?j),
+                                 ?i+1 = ?k,
+                                  ?k != ?j.
+
+
+
+
+basic_block_end(?soupa,?method):-  next(?method,?i,?j),
+
+                                 ?i+1 = ?k,
+                                  ?k != ?j,
+                                  next(?method,?soupa,?j).
+
+
+
+basic_block_end(?i,?method):-    last_row(?i,?method).
+
+
+
+next_end(?i,?method,?j):-next(?method,?i,?j),
+                         basic_block_end(?j,?method).
+
+next_end(?i,?method,?k):-
+                         next(?method,?i,?j),
+                         !basic_block_end(?j,?method),
+                         next_end(?j,?method,?k).
+
+
+
+basic_block(?i,?j,?method):-  basic_block_start(?i,?method),
+                              next_end(?i,?method,?j).
+
+
+constant_prop(?l,?m,?t,?c):-basic_block(?arxi,?telos,?m),
+                            constMove(?m, ?i, ?t, ?c),
+                            !dead(?i,?m,?t),
+                            instruction(?m,	?l,?k),
+
+                            varUse(?m,?l,?t),
+                            ?i>=?arxi,
+                            ?l<=?telos.

@@ -1,0 +1,131 @@
+/* Simple +/-/* expression language; parser evaluates constant expressions on the fly*/
+/**
+ *  Package and Import Specifications
+ */
+import java_cup.runtime.*;
+
+/**
+ *  Usercode Components
+ */
+parser code {:
+    // Connect this parser to a scanner!
+    Scanner s;
+    Parser(Scanner s){ this.s=s; }
+:}
+
+/* define how to connect to the scanner! */
+scan with {: return s.next_token(); :};
+
+/**
+ *  Symbol Lists
+ */
+
+/* Terminals (tokens returned by the scanner). */
+terminal            SEMI, PLUS, MINUS,MOD,DIV, TIMES, UMINUS, LPAREN, RPAREN ,LBRACKET,RBRACKET,EQUAL,COMMA,IF,ELSE,BIG,SMALL,RB;
+terminal String    NUMBER,ID;        // our scanner provides numbers as integers
+
+/*  Non terminals */
+non terminal String           functionlist;
+non terminal String           define;
+non terminal String          args,args1;
+non terminal String          cond_args;
+non terminal String         cond;
+non terminal String   expr;      // used to store evaluated subexpressions
+non terminal String   call,call1;      // used to store evaluated subexpressions
+
+/**
+ *  Precedence Declarations
+ */
+precedence left IF,ELSE;
+precedence left COMMA;
+precedence left PLUS, MINUS;
+precedence left EQUAL,BIG,SMALL;
+precedence left TIMES,DIV,MOD;
+precedence left LPAREN,RPAREN,RB;
+precedence left UMINUS;
+
+
+/**
+ *  The Grammar Rules
+ */
+
+
+functionlist::= functionlist define:i {: System.out.println(i);:}
+|               functionlist call:i {: System.out.println(i);:}
+|                    {: RESULT = "";       :}
+;
+
+
+define::=call1:i  expr :e RBRACKET  {: RESULT="("+"define "+i+e+")";:}
+         |call1:i  cond :e RBRACKET  {: RESULT="("+"define "+i+e+")";:}
+
+
+
+
+;
+
+
+
+
+expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = "("+"+"+e1+" "+e2+")";       :}
+             | expr:e1 MINUS expr:e2        {: RESULT = "("+"-"+e1+" "+e2+")";       :}
+             | expr:e1 TIMES expr:e2        {: RESULT = "("+"*"+e1+" "+e2+")";       :}
+             | expr:e1 DIV expr:e2        {: RESULT = "("+"/"+e1+" "+e2+")";       :}
+             | expr:e1 MOD expr:e2        {: RESULT = "("+" modulo "+e1+" "+e2+")";       :}
+             | call:e1                      {: RESULT = e1;       :}
+             | cond:e1                      {: RESULT = e1;       :}
+
+
+
+
+  	         %prec UMINUS
+             | LPAREN expr:e RPAREN	    {: RESULT = e;           :}
+             | NUMBER:i	                    {: RESULT = i;           :}
+             | ID:i	                    {: RESULT = i;           :}
+             |                     {:RESULT="";  :}
+
+
+
+             ;
+
+
+
+
+args ::=args:e1 COMMA expr:e2 {:RESULT = e1+" "+e2; :}
+        | expr:e1  {:RESULT = " "+e1; :}
+
+;
+
+args1 ::=ID:e1 COMMA args1:e2 {:RESULT = e1+" "+e2; :}
+| ID:e1  {:RESULT = e1; :}
+|                     {:RESULT="";  :}
+
+;
+
+
+
+
+cond::= IF  cond:e1 ELSE cond:e2 {: RESULT = "("+"if"+"("+e1+e2+")";:}
+        |IF  cond_args:e1 expr:e2 ELSE expr:e3 {: RESULT = "("+"if"+e1+e2+e3+")";       :}
+
+;
+
+cond_args::=  LPAREN expr:e1 EQUAL expr:e2 RPAREN {:RESULT = "("+"="+" "+e1+" "+e2+") "; :}
+            | LPAREN expr:e1 BIG expr:e2 RPAREN {:RESULT = ">"+" "+e1+" "+e2; :}
+            | LPAREN expr:e1 SMALL expr:e2 RPAREN {:RESULT = "<"+" "+e1+" "+e2; :}
+;
+
+call    ::=  ID:e1   LPAREN args:c RPAREN    {: RESULT = "("+e1+""+c+")";       :}
+           //  | ID:e1  LPAREN RPAREN   {: RESULT = "("+e1+")";       :}
+;
+
+
+call1  ::=  ID:e1   LPAREN args1:c RB    {: RESULT = "("+e1+" "+c+")";       :}
+
+;
+
+
+
+
+
+
